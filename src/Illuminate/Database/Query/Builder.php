@@ -21,6 +21,7 @@ use Illuminate\Support\Traits\ForwardsCalls;
 use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
 use RuntimeException;
+use Illuminate\Database\Query\Grammars\PostgresGrammar;
 
 class Builder
 {
@@ -692,6 +693,11 @@ class Builder
         [$value, $operator] = $this->prepareValueAndOperator(
             $value, $operator, func_num_args() === 2
         );
+
+        //@todo remove below condition once php8 fix the issue.
+        if (is_bool($value) && $this->grammar instanceof PostgresGrammar) {
+            $value = (string) $value;
+        }
 
         // If the columns is actually a Closure instance, we will assume the developer
         // wants to begin a nested where statement which is wrapped in parenthesis.
